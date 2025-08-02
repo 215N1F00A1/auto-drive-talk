@@ -3,11 +3,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChatInterface } from '@/components/ChatInterface';
 import { Dashboard } from '@/components/Dashboard';
+import { DemoSection } from '@/components/DemoSection';
 import { MessageSquare, BarChart3, HardDrive, Smartphone } from 'lucide-react';
 import { ActionLog } from '@/types/chat';
 
 const Index = () => {
   const [actionLogs, setActionLogs] = useState<ActionLog[]>([]);
+  const [triggerCommand, setTriggerCommand] = useState<string>('');
 
   const handleActionLogged = (action: string) => {
     const newLog: ActionLog = {
@@ -18,6 +20,14 @@ const Index = () => {
       status: action.includes('Error') ? 'error' : 'success'
     };
     setActionLogs(prev => [...prev, newLog]);
+  };
+
+  const handleSendCommand = (command: string) => {
+    setTriggerCommand(command);
+  };
+
+  const handleCommandProcessed = () => {
+    setTriggerCommand('');
   };
 
   return (
@@ -44,10 +54,14 @@ const Index = () => {
         {/* Main Content */}
         <div className="max-w-6xl mx-auto">
           <Tabs defaultValue="chat" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="chat" className="flex items-center space-x-2">
                 <MessageSquare className="h-4 w-4" />
                 <span>WhatsApp Chat</span>
+              </TabsTrigger>
+              <TabsTrigger value="demo" className="flex items-center space-x-2">
+                <Smartphone className="h-4 w-4" />
+                <span>Demo & Docs</span>
               </TabsTrigger>
               <TabsTrigger value="dashboard" className="flex items-center space-x-2">
                 <BarChart3 className="h-4 w-4" />
@@ -68,10 +82,18 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="h-[600px] border rounded-lg overflow-hidden">
-                    <ChatInterface onActionLogged={handleActionLogged} />
+                    <ChatInterface 
+                      onActionLogged={handleActionLogged}
+                      triggerCommand={triggerCommand}
+                      onCommandProcessed={handleCommandProcessed}
+                    />
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="demo" className="space-y-6">
+              <DemoSection onSendCommand={handleSendCommand} />
             </TabsContent>
 
             <TabsContent value="dashboard" className="space-y-6">

@@ -9,9 +9,15 @@ import { Message, DriveFile } from '@/types/chat';
 
 interface ChatInterfaceProps {
   onActionLogged: (action: string) => void;
+  triggerCommand?: string;
+  onCommandProcessed?: () => void;
 }
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onActionLogged }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+  onActionLogged, 
+  triggerCommand, 
+  onCommandProcessed 
+}) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -25,6 +31,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onActionLogged }) 
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Handle triggered commands from demo buttons
+  useEffect(() => {
+    if (triggerCommand) {
+      setInputValue(triggerCommand);
+      setTimeout(() => {
+        handleSendMessage();
+        onCommandProcessed?.();
+      }, 100);
+    }
+  }, [triggerCommand]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -91,14 +108,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onActionLogged }) 
             response = '❌ Please specify a file path to delete.';
             break;
           }
-          if (command.path.includes('*') || command.path === '/' || command.path === '') {
-            response = '⚠️ For safety, bulk deletion requires confirmation. Add CONFIRM to your command.';
-            break;
+          
+          // Safety checks for dangerous deletions
+          if (command.path.includes('*') || command.path === '/' || command.path === '' || command.path.split('/').length <= 2) {
+            if (command.parameters?.confirm !== 'true') {
+              response = `⚠️ **SAFETY WARNING**: This operation could delete multiple files or important directories.\n\nTo confirm, add CONFIRM to your command:\n\`DELETE ${command.path} CONFIRM\`\n\n🔒 This safety measure prevents accidental mass deletion.`;
+              break;
+            }
           }
+          
           const deleted = DriveService.deleteFile(command.path);
-          response = deleted ? 
-            `✅ Deleted "${command.path}" successfully.` : 
-            `❌ File "${command.path}" not found.`;
+          if (deleted) {
+            response = `✅ **File Deleted Successfully**\n📄 "${command.path}"\n\n🗑️ File has been moved to trash and can be recovered within 30 days.`;
+            onActionLogged(`Successfully deleted: ${command.path}`);
+          } else {
+            response = `❌ **File Not Found**\n📄 "${command.path}"\n\nPlease check the file path and try again.`;
+            onActionLogged(`Failed to delete: ${command.path} (not found)`);
+          }
           break;
 
         case 'MOVE':
@@ -129,7 +155,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onActionLogged }) 
           break;
 
         case 'HELP':
-          response = `🤖 Available Commands:\n\n• LIST /path - List files in a folder\n• DELETE /path/file.ext - Delete a specific file\n• MOVE /source /destination - Move file/folder\n• SUMMARY /path - Get AI summary of documents\n• HELP - Show this help message\n\nExample:\nLIST /ProjectX\nDELETE /ProjectX/old_report.pdf\nMOVE /ProjectX/report.pdf /Archive/\nSUMMARY /ProjectX`;
+          response = `🤖 **Google Drive Assistant Commands**\n\n**📁 File Operations:**\n• \`LIST /path\` - List files in folder\n• \`DELETE /path/file.ext\` - Delete specific file\n• \`MOVE /source /destination\` - Move file/folder\n\n**🤖 AI Operations:**\n• \`SUMMARY /path\` - Get document summaries\n• \`HELP\` - Show this help\n\n**🗣️ Natural Language:**\n• "Show me files in /ProjectX"\n• "Delete the report in /ProjectX"\n• "Summarize documents in /ProjectX"\n\n**🔒 Safety Features:**\n• Deletion confirmation for bulk operations\n• 30-day trash recovery\n• Audit logging\n\n**📝 Examples:**\n\`LIST /ProjectX\`\n\`DELETE /ProjectX/old_report.pdf\`\n\`MOVE /ProjectX/report.pdf /Archive/\`\n\`SUMMARY /ProjectX\``;
           break;
 
         default:
