@@ -17,8 +17,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 128 64% 35%;
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -26,8 +26,8 @@ All colors MUST be HSL.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 128 64% 45%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -36,7 +36,24 @@ All colors MUST be HSL.
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* WhatsApp-inspired colors */
+    --whatsapp-primary: 128 64% 35%;
+    --whatsapp-light: 128 50% 95%;
+    --whatsapp-dark: 128 80% 25%;
+    --chat-bg: 220 14% 96%;
+    --message-sent: 128 64% 35%;
+    --message-received: 0 0% 100%;
+    --message-time: 215.4 16.3% 46.9%;
+    
+    /* Gradients */
+    --gradient-whatsapp: linear-gradient(135deg, hsl(var(--whatsapp-primary)), hsl(var(--whatsapp-dark)));
+    --gradient-chat: linear-gradient(180deg, hsl(var(--whatsapp-light)), hsl(var(--chat-bg)));
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
