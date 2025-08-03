@@ -1,73 +1,175 @@
-# Welcome to your Lovable project
+# 📁 WhatsApp-Driven Google Drive Assistant (n8n Workflow)
 
-## Project info
+https://auto-drive-talk.vercel.app/
 
-**URL**: https://lovable.dev/projects/98beb275-d8df-4768-94c8-8a0c0030431c
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![n8n](https://img.shields.io/badge/n8n-Automation-blue.svg)](https://n8n.io/)
+[![Twilio](https://img.shields.io/badge/Twilio-WhatsApp-green.svg)](https://www.twilio.com/whatsapp)
+[![Google Drive](https://img.shields.io/badge/Google_Drive-API-blue.svg)](https://developers.google.com/drive)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT-yellow.svg)](https://openai.com/)
 
-## How can I edit this code?
+A professional automation solution to control your Google Drive via **WhatsApp** using **Twilio**, **Google APIs**, and **n8n Workflows**. Users can issue text commands over WhatsApp to list, delete, move, and summarize files securely and intelligently.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🧠 Key Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/98beb275-d8df-4768-94c8-8a0c0030431c) and start prompting.
+### Core Functions
 
-Changes made via Lovable will be committed automatically to this repo.
+* 📄 **List Files**: View contents of Google Drive folders
+* 🗑️ **Delete Files**: Remove files securely (with confirmation)
+* 📁 **Move Files**: Organize Drive by moving files/folders
+* 🧠 **Summarize Docs**: Summarize content of PDFs or DOCs using OpenAI
+* 🔁 **Dynamic Responses**: Replies with formatted drive data in WhatsApp
 
-**Use your preferred IDE**
+### Enhancements
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+* ✅ Confirmation prompts for destructive actions
+* 🔐 Secure OAuth2 auth for Google Drive
+* 📩 WhatsApp replies powered by Twilio sandbox
+* 💬 Command parser to handle structured input
+* 🧾 Simple audit log system (in-memory or optional DB)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🔧 Setup Instructions
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 1. Clone the Project
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+git clone https://github.com/yourusername/auto-drive-talk.git
+cd auto-drive-talk
 ```
 
-**Edit a file directly in GitHub**
+### 2. Install Dependencies
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+bun install  # or npm install
+```
 
-**Use GitHub Codespaces**
+### 3. Configure Environment Variables
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+> Copy `.env-sample` into `.env` and fill your values:
 
-## What technologies are used for this project?
+```bash
+cp .env-sample .env
+```
 
-This project is built with:
+```env
+# Twilio WhatsApp Sandbox
+TWILIO_ACCOUNT_SID=your-twilio-sid
+TWILIO_AUTH_TOKEN=your-auth-token
+TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:5678/rest/oauth2-credential/callback
 
-## How can I deploy this project?
+# OpenAI
+OPENAI_API_KEY=your-openai-api-key
 
-Simply open [Lovable](https://lovable.dev/projects/98beb275-d8df-4768-94c8-8a0c0030431c) and click on Share -> Publish.
+# n8n Config
+N8N_BASIC_AUTH_USER=admin
+N8N_BASIC_AUTH_PASSWORD=securepassword
+N8N_PORT=5678
+```
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 📱 WhatsApp Commands (via Twilio)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+| Command                       | Function                      |
+| ----------------------------- | ----------------------------- |
+| `LIST /MyDocs`                | Lists files in /MyDocs folder |
+| `DELETE /Old/report.pdf`      | Deletes specified file        |
+| `MOVE /Doc/file.txt /Archive` | Moves file to Archive         |
+| `SUMMARY /Notes`              | Summarizes documents inside   |
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+> Twilio webhook configured to receive and parse messages.
+
+---
+
+## 🐳 Running Locally
+
+### Using Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+### Without Docker (for testing only)
+
+```bash
+docker run -it --rm \
+  -p 5678:5678 \
+  -v ~/.n8n:/home/node/.n8n \
+  --env-file .env \
+  n8nio/n8n
+```
+
+Use [ngrok](https://ngrok.com/) to expose your local n8n:
+
+```bash
+ngrok http 5678
+```
+
+Set Twilio webhook to:
+
+```
+https://your-ngrok-url/webhook/whatsapp
+```
+
+---
+
+## 🧪 Demo Behavior
+
+* Simulated Drive with mock files (if no real API configured)
+* Simulated OpenAI summaries (demo mode)
+* WhatsApp command testing UI (in `src/`)
+* Dark Mode + Shadcn UI via Vite frontend (optional)
+
+---
+
+## 🏗️ File Structure
+
+```
+root/
+├── src/                   # Optional frontend helpers
+├── workflow.json          # n8n workflow export (core logic)
+├── .env-sample            # Environment template
+├── docker-compose.yml     # Docker runner
+└── README.md              # This file
+```
+
+---
+
+## 🔒 Security
+
+* OAuth2 scopes restricted to Google Drive file access
+* Twilio auth token validated before processing
+* `.env` ignored from version control
+* Admin credentials protected via n8n basic auth
+
+---
+
+## 🧠 Future Ideas
+
+* Real-time Google Drive sync feedback
+* Voice message parsing via WhatsApp
+* Multi-user support with access control
+* Persistent file history and audit log (Supabase)
+
+---
+
+## 📜 License
+
+MIT License. Use at your own risk. Contact court authorities before automating public portals.
+
+---
+
+## 🙋 Author & Acknowledgments
+
+Created with ❤️ by **\[Your Name]** as part of the ADmyBRAND Internship Task 2.
+📧 Email: [your.email@example.com](mailto:your.email@example.com)
+🙏 Thanks to **n8n**, **Twilio**, **OpenAI**, and **Google APIs** teams.
